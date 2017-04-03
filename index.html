@@ -118,6 +118,8 @@
         };
 
         var stop = function () {
+          $("#loops").text(0);
+          $("p.lead em span").hide();
           var time = moment().hour(0).minute(0).second(0).format('HH:mm:ss');
           $("#stopwatch").text(time);
           clearInterval(run);
@@ -138,7 +140,6 @@
 
         $("#btnStop").click(function () {
           stop();
-          $("p.lead em span").hide();
           $("#btnGroupResumeStop").hide();
           $("#btnStart").show();
         });
