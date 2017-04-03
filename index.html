@@ -54,7 +54,7 @@
     <script>
 
       $(function () {
-        var audio = new Audio("sounds/beep.wav")
+        var audio = null;
 
         var INHALE = 4,
             HOLD = 7,
@@ -100,6 +100,7 @@
           counter = 0;
           part = 0;
           loops = 0;
+          audio = new Audio("sounds/beep.wav");
           $("#inhale").show();
           next = INHALE;
           if (run == null) {
