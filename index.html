@@ -5,34 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>4-7-8</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+      h2 {
+        font-family: monospace;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
       <div class="row">
         <div class="col-md-6 col-lg-4 offset-md-3 offset-lg-4">
-          <h1 class="text-center mt-4">4-7-8</h2>
+          <h1 class="text-center mt-4">4-7-8</h1>
           <hr>
-          <h3 class="text-center">00:00:00</h3>
+          <p class="lead text-center">
+            <em>
+              <span id="inhale" style="display: none;">Inhale...</span>
+              <span id="hold" style="display: none;">Hold...</span>
+              <span id="exhale" style="display: none;">Exhale...</span>
+            </em>
+          </p>
+          <h2 class="text-center">
+            <span id="stopwatch">00:00:00</span>
+            (<span id="loops">0</span>)
+          </h3>
           <hr>
           <button type="button" class="btn btn-success btn-block" id="btnStart" role="button">Start</button>
-          <button type="button" class="btn btn-danger btn-block" id="btnStop" role="button" style="display: none;">Stop</button>
+          <button type="button" class="btn btn-secondary btn-block" id="btnPause" role="button" style="display: none;">Pause</button>
+          <div class="row" id="btnGroupResumeStop" style="display: none;">
+            <div class="col-sm-6">
+              <button type="button" class="btn btn-secondary btn-block" id="btnResume" role="button">Resume</button>
+            </div>
+            <div class="col-sm-6">
+              <button type="button" class="btn btn-danger btn-block" id="btnStop" role="button">Stop</button>
+            </div>
+          </div>
+          <p class="text-center mt-4">
+            <small>
+              <a href="https://www.youtube.com/watch?v=4Lb5L-VEm34" target="_blank">What is this about?</a>
+            </small>
+          </p>
         </div>
       </div>
     </div>
+    <audio id="sound"><source src="sounds/Slap_with_Glove.mp3" type="audio/mp3"></audio>
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="js/moment.min.js"></script>
     <script>
+
       $(function () {
+        var INHALE = 4,
+            HOLD = 7,
+            EXHALE = 8;
+
+        var counter = 0,
+            part = 0,
+            loops = 0,
+            run = null,
+            next = 0;
+
+        var update = function () {
+          counter++;
+          part++;
+          var time = moment().hour(0).minute(0).second(counter).format('HH:mm:ss');
+          $("#stopwatch").text(time);
+
+          if (part % next == 0) {
+            $("#sound")[0].play();
+            part = 0;
+            $("p.lead em > span").hide();
+
+            if (next == INHALE) {
+              next = HOLD;
+              $("#hold").show();
+            }
+            else if (next == HOLD) {
+              next = EXHALE;
+              $("#exhale").show();
+            }
+            else if (next == EXHALE) {
+              next = HOLD;
+              $("#hold").show();
+              loops++;
+              $("#loops").text(loops);
+            }
+
+          }
+
+        };
+
+        var start = function () {
+          counter = 0;
+          part = 0;
+          loops = 0;
+          $("#inhale").show();
+          next = INHALE;
+          if (run == null) {
+            run = setInterval(update, 1000);
+          }
+        };
+
+        var resume = function () {
+          if (run == null) {
+            run = setInterval(update, 1000);
+          }
+        };
+
+        var pause = function () {
+          clearInterval(run);
+          run = null;
+        };
+
+        var stop = function () {
+          var time = moment().hour(0).minute(0).second(0).format('HH:mm:ss');
+          $("#stopwatch").text(time);
+          clearInterval(run);
+          run = null;
+        };
+
         $("#btnStart").click(function () {
+          start();
           $(this).hide();
-          $("#btnStop").show();
+          $("#btnPause").show();
+        });
+
+        $("#btnPause").click(function () {
+          pause();
+          $(this).hide();
+          $("#btnGroupResumeStop").show();
         });
 
         $("#btnStop").click(function () {
-          $(this).hide();
+          stop();
+          $("p.lead em span").hide();
+          $("#btnGroupResumeStop").hide();
           $("#btnStart").show();
         });
+
+        $("#btnResume").click(function () {
+          resume();
+          $("#btnGroupResumeStop").hide();
+          $("#btnPause").show();
+        });
+
       });
     </script>
   </body>
