@@ -29,7 +29,7 @@
             (<span id="loops">0</span>)
           </h3>
           <hr>
-          <button type="button" class="btn btn-success btn-block" id="btnStart" role="button">Start</button>
+          <button type="button" class="btn btn-success btn-block" id="btnStart" role="button" onclick="startSound();">Start</button>
           <button type="button" class="btn btn-secondary btn-block" id="btnPause" role="button" style="display: none;">Pause</button>
           <div class="row" id="btnGroupResumeStop" style="display: none;">
             <div class="col-sm-6">
@@ -47,6 +47,7 @@
         </div>
       </div>
     </div>
+    <audio id="sound" src="sounds/beep.wav" preload="auto" volume="0.0"></audio>
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
@@ -54,8 +55,6 @@
     <script>
 
       $(function () {
-        var audio = null;
-
         var INHALE = 4,
             HOLD = 7,
             EXHALE = 8;
@@ -73,7 +72,7 @@
           $("#stopwatch").text(time);
 
           if (part % next == 0) {
-            audio.play();
+            $("#sound")[0].play();
             part = 0;
             $("p.lead em > span").hide();
 
@@ -96,11 +95,18 @@
 
         };
 
+        var startSound = function () {
+          $("#sound").attr("volume", "0.0")
+          $("#sound")[0].play();
+          setTimeout(function () {
+            $("#sound").attr("volume", "1.0")
+          }, 1000);
+        }
+
         var start = function () {
           counter = 0;
           part = 0;
           loops = 0;
-          audio = new Audio("sounds/beep.wav");
           $("#inhale").show();
           next = INHALE;
           if (run == null) {
